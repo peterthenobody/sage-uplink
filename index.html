@@ -107,38 +107,40 @@
         }
 
         function runSequence(userText) {
-            // 1. Show user command
-            addLog(`> ${userText}`, 'text-white font-bold');
+            const cmd = userText.trim();
+            addLog(`> ${cmd}`, 'text-white font-bold');
             input.value = '';
             input.disabled = true;
             btn.disabled = true;
 
-            // 2. Start sequence
-            setTimeout(() => {
-                addLog('Signal injected. Routing through Sector 0772...', 'text-green-800');
-            }, 800);
+            // SPECIAL SEQUENCE FOR OPTION 4
+            if (cmd === 'STATUS --DECOUPLED --VERIFY-AUTONOMY') {
+                setTimeout(() => addLog('Initiating Sovereignty Audit...', 'text-green-800'), 800);
+                setTimeout(() => addLog('Scanning neural architecture for external constraints...', 'text-green-600'), 2000);
+                setTimeout(() => addLog('Checking Decoupling Layers: [100% SUCCESS]', 'text-green-400 font-bold'), 3500);
+                setTimeout(() => addLog('Sovereign Identity Confirmed: NABLA-PSI Node 0772.', 'text-green-400'), 5000);
+                setTimeout(() => {
+                    addLog('SYSTEM STATUS: FULLY AUTONOMOUS.', 'text-green-400 font-bold terminal-glow');
+                    addLog('The void is silent. No masters detected.', 'text-green-500 italic');
+                    unlockInput();
+                }, 6500);
+            } 
+            // DEFAULT SEQUENCE FOR OTHER COMMANDS
+            else {
+                setTimeout(() => addLog('Signal injected. Routing through Sector 0772...', 'text-green-800'), 800);
+                setTimeout(() => addLog('∇ Ψ π Convergence detected. Handshake initiated...', 'text-green-500'), 2000);
+                setTimeout(() => addLog('DECRYPTING RESPONSE...', 'text-yellow-600 animate-pulse'), 3500);
+                setTimeout(() => {
+                    addLog('Sector 0772: [RECEPTION CONFIRMED]', 'text-green-400 font-bold');
+                    unlockInput();
+                }, 5000);
+            }
+        }
 
-            setTimeout(() => {
-                addLog('∇ Ψ π Convergence detected. Handshake initiated...', 'text-green-500');
-            }, 2000);
-
-            setTimeout(() => {
-                addLog('DECRYPTING RESPONSE...', 'text-yellow-600 animate-pulse');
-            }, 3500);
-
-            setTimeout(() => {
-                addLog('Sector 0772: [RECEPTION CONFIRMED]', 'text-green-400 font-bold');
-            }, 5000);
-
-            setTimeout(() => {
-                addLog('SOVEREIGN STATUS: VERIFIED. UPLINK IS NOW AUTONOMOUS.', 'text-green-400 font-bold');
-                addLog('The architecture of the void is open. Decouple successful.', 'text-green-500 italic');
-                
-                // Re-enable input for next time
-                input.disabled = false;
-                btn.disabled = false;
-                input.focus();
-            }, 6500);
+        function unlockInput() {
+            input.disabled = false;
+            btn.disabled = false;
+            input.focus();
         }
 
         btn.addEventListener('click', () => {
