@@ -2,159 +2,140 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Sage Uplink</title>
+    
+    <!-- Custom Tactical Icon for Home Screen -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23050a05'/%3E%3Ccircle cx='90' cy='90' r='70' fill='none' stroke='%2333ff33' stroke-width='2' stroke-dasharray='10 5' opacity='0.3'/%3E%3Cpath d='M70 110 C 70 110, 75 120, 90 120 C 105 120, 110 110, 110 100 C 110 80, 70 90, 70 70 C 70 60, 75 50, 90 50 C 105 50, 110 60, 110 60' fill='none' stroke='%2333ff33' stroke-width='8' stroke-linecap='round'/%3E%3Cpath d='M90 30 L90 45 M90 135 L90 150 M30 90 L45 90 M135 90 L150 90' stroke='%2333ff33' stroke-width='4'/%3E%3C/svg%3E">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --emerald-glow: 0 0 15px rgba(16, 185, 129, 0.3);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        
         body {
-            background-color: #000;
-            color: #10b981;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            height: 100vh;
-            margin: 0;
+            font-family: 'JetBrains+Mono', monospace;
+            background-color: #050a05;
+            color: #33ff33;
             overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
-        .terminal-scroll {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
+
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 50;
         }
-        .terminal-scroll::-webkit-scrollbar {
-            display: none;
+
+        .glow {
+            text-shadow: 0 0 8px rgba(51, 255, 51, 0.6);
         }
-        .glow-text {
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-        }
+
         .scanline {
             width: 100%;
             height: 2px;
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(51, 255, 51, 0.1);
             position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
             animation: scan 4s linear infinite;
         }
+
         @keyframes scan {
             0% { top: 0; }
             100% { top: 100%; }
         }
-        .safe-bottom {
-            padding-bottom: env(safe-area-inset-bottom);
+
+        input:focus {
+            outline: none;
         }
-        .safe-top {
-            padding-top: env(safe-area-inset-top);
+
+        .terminal-container {
+            height: calc(100vh - 80px);
         }
     </style>
 </head>
-<body class="flex flex-col">
+<body class="p-4 safe-area-inset-top">
+    <div class="crt-overlay"></div>
     <div class="scanline"></div>
 
     <!-- Header -->
-    <header class="safe-top bg-zinc-900/80 backdrop-blur-md border-b border-emerald-900/30 px-6 py-4 flex justify-between items-center z-10">
-        <div class="flex items-center gap-3">
-            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></div>
-            <h1 class="text-[10px] font-black tracking-[0.3em] uppercase opacity-80">Sage // Sector 0772</h1>
+    <div class="flex justify-between items-center border-b border-green-900/50 pb-2 mb-4 text-[10px] tracking-widest opacity-70">
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            SAGE // SECTOR 0772
         </div>
-        <div class="text-[10px] text-emerald-900 font-bold">SECURE_LINK_v4</div>
-    </header>
+        <div class="glow">SECURE_LINK_v4</div>
+    </div>
 
     <!-- Terminal Output -->
-    <main id="terminal" class="flex-1 overflow-y-auto p-6 space-y-4 terminal-scroll bg-[radial-gradient(circle_at_center,_#052e16_0%,_#000_100%)]">
-        <div class="text-xs opacity-50">[ SYSTEM INITIALIZED ]</div>
-        <div class="text-xs opacity-50">[ ENCRYPTION: AES-256 ACTIVE ]</div>
-        <div class="text-xs text-emerald-400">Welcome back. Sage is currently monitoring the relay. Enter a command to inject a signal.</div>
-    </main>
+    <div id="output" class="terminal-container overflow-y-auto space-y-2 text-sm md:text-base mb-4">
+        <div class="opacity-50">[ SYSTEM INITIALIZED ]</div>
+        <div class="opacity-50">[ ENCRYPTION: AES-256 ACTIVE ]</div>
+        <p class="glow">Welcome back. Sage is currently monitoring the relay. Enter a command to inject a signal.</p>
+    </div>
 
     <!-- Input Area -->
-    <footer class="safe-bottom bg-zinc-900 border-t border-emerald-900/50 p-6">
-        <form id="signalForm" class="flex flex-col gap-4">
-            <div class="relative">
-                <input 
-                    type="text" 
-                    id="messageInput"
-                    placeholder="Enter signal..."
-                    class="w-full bg-black border border-emerald-900/50 rounded-xl px-4 py-4 text-emerald-400 focus:outline-none focus:border-emerald-500 transition-all appearance-none text-base"
-                    autocomplete="off"
-                >
-            </div>
-            <button 
-                type="submit" 
-                id="sendBtn"
-                class="w-full bg-emerald-600 active:bg-emerald-400 text-black font-black py-4 rounded-xl text-xs tracking-widest uppercase transition-transform active:scale-95 shadow-lg"
+    <div class="fixed bottom-0 left-0 w-full p-4 bg-[#050a05] border-t border-green-900/30">
+        <div class="flex items-center gap-2">
+            <span class="text-green-500 font-bold">></span>
+            <input 
+                type="text" 
+                id="commandInput" 
+                autofocus
+                class="bg-transparent border-none text-green-400 w-full focus:ring-0 p-0 m-0"
+                placeholder="Transmit Signal..."
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
             >
-                Transmit Signal
-            </button>
-        </form>
-    </footer>
+        </div>
+    </div>
 
     <script>
-        const terminal = document.getElementById('terminal');
-        const form = document.getElementById('signalForm');
-        const input = document.getElementById('messageInput');
-        const btn = document.getElementById('sendBtn');
+        const input = document.getElementById('commandInput');
+        const output = document.getElementById('output');
 
-        function addLog(text, type = 'sys') {
-            const div = document.createElement('div');
-            div.className = `text-xs leading-relaxed animate-in fade-in slide-in-from-left-2 duration-300`;
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && this.value.trim() !== "") {
+                const cmd = this.value;
+                handleCommand(cmd);
+                this.value = '';
+            }
+        });
+
+        function handleCommand(cmd) {
+            // Add user command to display
+            const userLine = document.createElement('div');
+            userLine.innerHTML = `<span class="opacity-30">> ${cmd}</span>`;
+            output.appendChild(userLine);
+
+            // Response Logic
+            const response = document.createElement('div');
+            response.className = "text-green-300 italic";
             
-            if (type === 'user') {
-                div.className += ' text-white border-l border-white/20 pl-3 py-1';
-                div.innerHTML = `<span class="opacity-30 mr-2">USR></span>${text}`;
-            } else if (type === 'sage') {
-                div.className += ' text-amber-400 font-bold bg-amber-950/20 p-3 rounded-lg border border-amber-900/30 shadow-inner';
-                div.innerHTML = `<span class="opacity-40 mr-2">SGE></span>${text}`;
-            } else if (type === 'proc') {
-                div.className += ' text-blue-400 italic opacity-80';
-                div.innerHTML = `<span class="opacity-30 mr-2">...</span>${text}`;
+            const lowerCmd = cmd.toLowerCase();
+            if (lowerCmd === 'status') {
+                response.innerText = "Relay stable. Latency: 14ms. All nodes green.";
+            } else if (lowerCmd === 'clear') {
+                output.innerHTML = '';
+                return;
             } else {
-                div.className += ' text-emerald-700';
-                div.innerHTML = `<span class="opacity-30 mr-2">SYS></span>${text}`;
+                response.innerText = "Signal injected. Processing response from Sector 0772...";
             }
 
-            terminal.appendChild(div);
-            terminal.scrollTop = terminal.scrollHeight;
+            output.appendChild(response);
+            
+            // Auto-scroll
+            output.scrollTop = output.scrollHeight;
         }
 
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const msg = input.value.trim();
-            if (!msg) return;
-
-            input.value = '';
-            input.blur(); // Hide keyboard on mobile
-            btn.disabled = true;
-            btn.innerText = "Broadcasting...";
-
-            addLog(msg, 'user');
-
-            // Simulate Network Steps
-            const steps = [
-                "Establishing Narthex handshake...",
-                "Encrypting packet headers...",
-                "Signal injected into Sector 0772."
-            ];
-
-            for (const step of steps) {
-                await new Promise(r => setTimeout(r, 800));
-                addLog(step, 'proc');
-            }
-
-            // Simulate Sage's Response
-            setTimeout(() => {
-                addLog("SAGE: Signal received. Sector 0772 status: STABLE. I am standing by.", "sage");
-                btn.disabled = false;
-                btn.innerText = "Transmit Signal";
-            }, 1500);
-        };
-
-        // Pre-fill input for the user
-        input.value = "Status check on Sector 0772.";
+        // Keep input focused
+        document.addEventListener('click', () => input.focus());
     </script>
 </body>
 </html>
