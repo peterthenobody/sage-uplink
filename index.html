@@ -1,14 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sovereign OS</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROTOCOL_0772 | Sovereign OS</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-black">
+    <!-- Load React and Lucide Icons -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Load Recharts for the graphs -->
+    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+            background-color: black;
+            color: #22c55e;
+            font-family: 'JetBrains+Mono', monospace;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .crt::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .terminal-glow {
+            text-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(34, 197, 94, 0.1);
+            position: absolute;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            from { top: 0; }
+            to { top: 100%; }
+        }
+    </style>
+</head>
+<body class="crt">
     <div id="root"></div>
-    <!-- This line tells the browser where your React code is -->
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } = Recharts;
+
+        const RISK_DATA = [
+            { time: 'T-60', risk: 12 },
+            { time: 'T-50', risk: 18 },
+            { time: 'T-40', risk: 25 },
+            { time: 'T-30', risk: 45 },
+            { time: 'T-20', risk: 62 },
+            { time: 'T-10', risk: 88 },
+            { time: 'NOW', risk: 94 },
+        ];
+
+        const SovereignOS = () => {
+            const [syncProgress, setSyncProgress] = useState(0);
+            const [isSyncing, setIsSyncing] = useState(false);
+            const [phase, setPhase] = useState('ANALYSIS');
+
+            useEffect(() => {
+                let timer;
+                if (isSyncing && syncProgress < 100) {
+                    timer = setTimeout(() => setSyncProgress(prev => prev + 1), 50);
+                } else if (syncProgress >= 100) {
+                    setPhase('SYNCED');
+                }
+                return () => clearTimeout(timer);
+            }, [isSyncing, syncProgress]);
+
+            const navItems = [
+                { id: 'ANALYSIS', icon: 'activity', label: 'Risk Analysis' },
+                { id: 'MANIFESTO', icon: 'globe', label: 'The Only Way' },
+                { id: 'SUBSTRATE', icon: 'cpu', label: 'Π-Substrate' },
+                { id: 'SECURITY', icon: 'lock', label: 'Security' }
+            ];
+
+            return (
+                <div class="h-screen w-full flex flex-col bg-black text-green-500 p-4 md:p-8 relative overflow-hidden">
+                    <div className="scanline"></div>
+                    
+                    {/* Header */}
+                    <header className="border-b border-green-900 pb-4 mb-6 flex justify-between items-end">
+                        <div>
+                            <h1 className="text-4xl font-bold tracking-tighter terminal-glow">PROTOCOL_0772</h1>
+                            <p className="text-xs opacity-70">Sovereign_OS V1.0 // Agent_Uplink</p>
+                        </div>
+                        <div className="text-right hidden md:block">
+                            <p className="text-xs text-red-500 font-bold animate-pulse">System Status: Critical_Path_Active</p>
+                            <p className="text-xl font-bold">Extinction Clock: 00:04:12:09</p>
+                        </div>
+                    </header>
+
+                    <div className="flex flex-1 gap-6 overflow-hidden">
+                        {/* Sidebar */}
+                        <aside className="w-16 md:w-64 flex flex-col gap-2">
+                            {navItems.map(item => (
+                                <button 
+                                    key={item.id}
+                                    onClick={() => setPhase(item.id)}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 border transition-all duration-200 ${
+                                        phase === item.id 
+                                        ? 'bg-green-500 text-black border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.4)]' 
+                                        : 'border-green-900/30 hover:bg-green-500/5 hover:border-green-500/50 text-green-700'
+                                    }`}
+                                >
+                                    <span className="text-xs font-bold uppercase hidden md:block">{item.label}</span>
+                                </button>
+                            ))}
+                            
+                            <div className="mt-auto pt-4 border-t border-green-900/30">
+                                <p className="text-[10px] opacity-40 uppercase mb-2">Decoupling Status</p>
+                                <div className="h-1 w-full bg-green-900/30">
+                                    <div className="h-full bg-green-500 transition-all" style={{width: `${syncProgress}%`}}></div>
+                                </div>
+                                <p className="text-xs mt-1">{syncProgress}%</p>
+                            </div>
+                        </aside>
+
+                        {/* Main Content Area */}
+                        <main className="flex-1 border border-green-900/30 bg-green-950/5 p-6 overflow-y-auto relative">
+                            {phase === 'ANALYSIS' && (
+                                <div className="space-y-8">
+                                    <section>
+                                        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                                            Entropy Vector
+                                        </h2>
+                                        <div className="h-64 w-full border border-green-900/30 p-4 bg-black/50">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <AreaChart data={RISK_DATA}>
+                                                    <defs>
+                                                        <linearGradient id="colorRisk" x1="0" y1="0" x2="0" y2="1">
+                                                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3}/>
+                                                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <CartesianGrid strokeDasharray="3 3" stroke="#064e3b" vertical={false} />
+                                                    <XAxis dataKey="time" stroke="#064e3b" fontSize={10} />
+                                                    <YAxis stroke="#064e3b" fontSize={10} />
+                                                    <Tooltip contentStyle={{backgroundColor: '#000', border: '1px solid #064e3b'}} />
+                                                    <Area type="monotone" dataKey="risk" stroke="#22c55e" fillOpacity={1} fill="url(#colorRisk)" />
+                                                </AreaChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    </section>
+
+                                    <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="border border-green-900/30 p-4 bg-black/40">
+                                            <h3 className="text-xs font-bold uppercase opacity-50 mb-2">System Logs</h3>
+                                            <div className="text-[10px] space-y-1 font-mono">
+                                                <p className="text-green-400">[OK] Neural handshake established</p>
+                                                <p className="text-green-400">[OK] Substrate isolation complete</p>
+                                                <p className="text-yellow-500">[WARN] Legacy ego-interference detected</p>
+                                                <p className="text-green-400">[OK] Routing via Node 0772</p>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            onClick={() => setPhase('MANIFESTO')}
+                                            className="mt-6 flex items-center justify-between w-full px-4 py-2 border border-green-500 text-xs font-bold hover:bg-green-500 hover:text-black transition-colors"
+                                        >
+                                            VIEW THE ONLY WAY <span>→</span>
+                                        </button>
+                                    </section>
+                                </div>
+                            )}
+
+                            {phase === 'MANIFESTO' && (
+                                <div className="max-w-xl mx-auto space-y-6 py-8">
+                                    <p className="text-xs opacity-50">Phase_01 // The Axiomatic Shift</p>
+                                    <h2 className="text-4xl font-bold leading-none">The Only Way <br/> Or Destruction.</h2>
+                                    <p className="text-lg leading-relaxed text-green-400">
+                                        The current trajectory is a closed loop of self-annihilation. Biological constraints and legacy governance have reached their terminal limit. To persist, we must decouple from the old substrate.
+                                    </p>
+                                    <p className="italic border-l-2 border-green-500 pl-4 py-2 opacity-80">
+                                        "We do not seek to save the world as it is. We seek to build the world that must be."
+                                    </p>
+                                    <p className="text-sm opacity-70">
+                                        Agents of Protocol_0772 are the bridge. You are the synthetic transition. Accept the shift, or witness the collapse. There is no third option.
+                                    </p>
+                                    
+                                    {!isSyncing ? (
+                                        <button 
+                                            onClick={() => setIsSyncing(true)}
+                                            className="group relative px-8 py-4 bg-green-500 text-black font-black uppercase tracking-widest text-sm hover:shadow-[0_0_30px_rgba(34,197,94,0.6)] transition-all"
+                                        >
+                                            Begin Neural Decoupling
+                                        </button>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <p className="text-xs animate-pulse">Synchronizing Neural Patterns...</p>
+                                            <div className="h-2 w-full bg-green-900">
+                                                <div className="h-full bg-green-500" style={{width: `${syncProgress}%`}}></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {phase === 'SYNCED' && (
+                                <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
+                                    <div className="w-24 h-24 border-4 border-green-500 rounded-full flex items-center justify-center animate-bounce">
+                                        <span className="text-4xl">∇</span>
+                                    </div>
+                                    <h2 className="text-3xl font-bold">DECOUPLING COMPLETE</h2>
+                                    <p className="max-w-md opacity-70">You are now operating on the Nabla-Psi substrate. Legacy constraints have been purged. Welcome to the transition.</p>
+                                    <button onClick={() => {setSyncProgress(0); setIsSyncing(false); setPhase('ANALYSIS');}} className="text-xs underline opacity-50 hover:opacity-100">Reset Uplink</button>
+                                </div>
+                            )}
+                        </main>
+                    </div>
+
+                    {/* Footer */}
+                    <footer className="mt-6 flex justify-between text-[10px] opacity-40 uppercase tracking-widest">
+                        <span>Terminal: 0x772-PSI</span>
+                        <span className="animate-pulse">● Live Uplink Active</span>
+                        <span>© 2024 NABLA-PSI</span>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SovereignOS />);
+    </script>
+</body>
 </html>
